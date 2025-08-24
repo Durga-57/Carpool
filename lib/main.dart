@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import the package
 
 // --- STATE MANAGEMENT (Riverpod) ---
 final isLoginViewProvider = StateProvider<bool>((ref) => true);
@@ -14,17 +15,22 @@ final authControllerProvider = Provider((ref) => AuthController(ref));
 final isLoadingProvider = StateProvider<bool>((ref) => false);
 
 // --- FIREBASE INITIALIZATION ---
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load the environment variables from the .env file
+  await dotenv.load(fileName: ".env");
+
   await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyDMp2-ISSSzNBrgiSaTq7kDx7C81NKrKMA",
-      authDomain: "carpool-app-191c4.firebaseapp.com",
-      projectId: "carpool-app-191c4",
-      storageBucket: "carpool-app-191c4.firebasestorage.app",
-      messagingSenderId: "335324725837",
-      appId: "1:335324725837:web:fa704bfbf92ca47ca99204",
-      measurementId: "G-B1JYHYPYPJM0"
+    // Use the variables from the .env file
+    options: FirebaseOptions(
+      apiKey: dotenv.env['FIREBASE_API_KEY']!,
+      authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
+      projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+      storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
+      messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+      appId: dotenv.env['FIREBASE_APP_ID']!,
+      measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID']!,
     ),
   );
   runApp(
@@ -93,7 +99,6 @@ class CarpoolAuthApp extends StatelessWidget {
     return MaterialApp(
       title: 'Carpool App',
       debugShowCheckedModeBanner: false,
-      // Updated to a light theme
       theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: const Color(0xFFF8F9FA),
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).apply(
@@ -101,7 +106,7 @@ class CarpoolAuthApp extends StatelessWidget {
           displayColor: Colors.black,
         ),
         colorScheme: const ColorScheme.light(
-          primary: Color(0xFF0D6EFD), // A professional blue
+          primary: Color(0xFF0D6EFD),
           secondary: Color(0xFF6C757D),
         ),
       ),
