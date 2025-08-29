@@ -1,5 +1,4 @@
 import 'package:carpool_app/groups_screen.dart';
-import 'package:carpool_app/trip_management_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
