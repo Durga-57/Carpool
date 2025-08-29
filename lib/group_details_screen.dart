@@ -61,7 +61,8 @@ class GroupDetailsScreen extends StatelessWidget {
               if (memberIds.isEmpty)
                 const Center(child: Text('No members in this group yet.'))
               else
-                ...memberIds.map((userId) => _buildMemberTile(userId)).toList(),
+                // Removed unnecessary .toList()
+                ...memberIds.map((userId) => _buildMemberTile(userId)),
             ],
           );
         },

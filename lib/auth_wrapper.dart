@@ -1,4 +1,4 @@
-import 'package:carpool_app/home_screen.dart'; // Import the new Home Screen
+import 'package:carpool_app/home_screen_v3.dart'; // Import the new Home Screen
 import 'package:carpool_app/main.dart';
 import 'package:carpool_app/profile_onboarding_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,8 +40,8 @@ class ProfileCheck extends StatelessWidget {
         if (!snapshot.hasData || !snapshot.data!.exists || snapshot.data!.get('name') == null) {
           return const ProfileOnboardingScreen();
         }
-        // Show the new HomeScreen instead of the old DashboardScreen
-        return const HomeScreen();
+        // Show the new HomeScreenV3
+        return const HomeScreenV3();
       },
     );
   }
