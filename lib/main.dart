@@ -4,46 +4,57 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // Required for local dev
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // --- STATE MANAGEMENT (Riverpod) ---
 final isLoginViewProvider = StateProvider<bool>((ref) => true);
-
-final authControllerProvider = Provider((ref) {
-  return AuthController(ref);
-});
-
+final authControllerProvider = Provider((ref) => AuthController(ref));
 final isLoadingProvider = StateProvider<bool>((ref) => false);
 
 // --- FIREBASE INITIALIZATION ---
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // SECURE DEPLOYMENT: Read keys from the build environment.
-  // These are passed in via the --dart-define flag.
-  const firebaseApiKey = String.fromEnvironment('FIREBASE_API_KEY');
-  const firebaseAuthDomain = String.fromEnvironment('FIREBASE_AUTH_DOMAIN');
-  const firebaseProjectId = String.fromEnvironment('FIREBASE_PROJECT_ID');
-  const firebaseStorageBucket =
-      String.fromEnvironment('FIREBASE_STORAGE_BUCKET');
-  const firebaseMessagingSenderId =
-      String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID');
-  const firebaseAppId = String.fromEnvironment('FIREBASE_APP_ID');
+  // Load environment variables from the .env file for local development.
+  await dotenv.load(fileName: ".env");
 
-  if (firebaseApiKey.isEmpty) {
-    print("Firebase environment variables are not set. App cannot start.");
+  // This is the HYBRID approach.
+  // It tries to get the key from the build command (--dart-define).
+  // If it's not there, it falls back to the .env file.
+  const apiKeyFromEnv = String.fromEnvironment('FIREBASE_API_KEY');
+  final finalApiKey = apiKeyFromEnv.isNotEmpty ? apiKeyFromEnv : dotenv.env['FIREBASE_API_KEY'];
+
+  const authDomainFromEnv = String.fromEnvironment('FIREBASE_AUTH_DOMAIN');
+  final finalAuthDomain = authDomainFromEnv.isNotEmpty ? authDomainFromEnv : dotenv.env['FIREBASE_AUTH_DOMAIN'];
+
+  const projectIdFromEnv = String.fromEnvironment('FIREBASE_PROJECT_ID');
+  final finalProjectId = projectIdFromEnv.isNotEmpty ? projectIdFromEnv : dotenv.env['FIREBASE_PROJECT_ID'];
+  
+  const storageBucketFromEnv = String.fromEnvironment('FIREBASE_STORAGE_BUCKET');
+  final finalStorageBucket = storageBucketFromEnv.isNotEmpty ? storageBucketFromEnv : dotenv.env['FIREBASE_STORAGE_BUCKET'];
+  
+  const messagingSenderIdFromEnv = String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID');
+  final finalMessagingSenderId = messagingSenderIdFromEnv.isNotEmpty ? messagingSenderIdFromEnv : dotenv.env['FIREBASE_MESSAGING_SENDER_ID'];
+  
+  const appIdFromEnv = String.fromEnvironment('FIREBASE_APP_ID');
+  final finalAppId = appIdFromEnv.isNotEmpty ? appIdFromEnv : dotenv.env['FIREBASE_APP_ID'];
+
+
+  if (finalApiKey == null || finalApiKey.isEmpty) {
+    print("FATAL ERROR: Firebase API Key is not set in .env or via --dart-define.");
     return;
   }
 
   await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: firebaseApiKey,
-      authDomain: firebaseAuthDomain,
-      projectId: firebaseProjectId,
-      storageBucket: firebaseStorageBucket,
-      messagingSenderId: firebaseMessagingSenderId,
-      appId: firebaseAppId,
+    options: FirebaseOptions(
+      apiKey: finalApiKey,
+      authDomain: finalAuthDomain!,
+      projectId: finalProjectId!,
+      storageBucket: finalStorageBucket!,
+      messagingSenderId: finalMessagingSenderId!,
+      appId: finalAppId!,
     ),
   );
 
